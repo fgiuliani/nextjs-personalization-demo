@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function middleware(req) {
   let res = NextResponse.next();
-  const user_type = req.cookies["user_type"] || "";
+  const user_type = req.cookies.get("user_type") || "";
   let personalized_paths = [];
   let personalized_data = {};
   let no_cache = false;
@@ -23,8 +23,14 @@ export async function middleware(req) {
   // Special actions in case it's the catalog or a personalized path
   if (req.nextUrl.pathname.includes("catalog")) {
     const catalogs = ["/catalog/sportswear", "/catalog/elegant"];
-    if (!req.cookies["user_type"] && catalogs.includes(req.nextUrl.pathname)) {
-      res.cookie("user_type", req.nextUrl.pathname.replace("/catalog/", ""));
+    if (
+      !req.cookies.get("user_type") &&
+      catalogs.includes(req.nextUrl.pathname)
+    ) {
+      res.cookies.set(
+        "user_type",
+        req.nextUrl.pathname.replace("/catalog/", "")
+      );
     } else {
       no_cache = true;
     }
